@@ -1,0 +1,45 @@
+{
+  "id": "ios-custom",
+  "name": "iOS Custom",
+  "description": "A customizable iPhone icon with explicit layer guidance.",
+  "categories": ["custom", "utility"],
+  "best_for": ["apps that need a balanced default icon", "early product exploration"],
+  "avoid_for": ["photo-heavy brand marks", "icons that require readable text"],
+  "style": {
+    "aesthetic": "modern iOS app icon, simple, memorable, high legibility at small sizes",
+    "palette": ["adaptive brand color", "warm white", "deep accent"],
+    "lighting": "soft studio lighting with subtle depth",
+    "material": "matte 3D"
+  },
+  "layers": [
+    {
+      "name": "background",
+      "role": "base",
+      "description": "rounded-square safe-area background with gentle depth",
+      "required": true
+    },
+    {
+      "name": "symbol",
+      "role": "primary",
+      "description": "single centered metaphor for the app purpose",
+      "required": true
+    },
+    {
+      "name": "accent",
+      "role": "detail",
+      "description": "small supporting shape that improves meaning without clutter",
+      "required": false
+    }
+  ],
+  "parameters": {
+    "safe_area": "keep important details inside the central 80 percent",
+    "avoid": ["text", "letters", "busy screenshots"]
+  },
+  "prompt_hints": ["no words", "no letters", "centered composition", "app-store-ready"],
+  "negative_prompt": ["text", "letters", "screenshots", "Apple hardware replicas"],
+  "output": {
+    "size": 1024,
+    "format": "png",
+    "alpha": false
+  }
+}
