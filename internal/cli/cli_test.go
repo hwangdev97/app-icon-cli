@@ -144,3 +144,18 @@ func TestGenerateRejectsInvalidRichness(t *testing.T) {
 		t.Fatalf("code=%d stderr=%s", code, errOut.String())
 	}
 }
+
+func TestVersionCommand(t *testing.T) {
+	old := Version
+	Version = "test-version"
+	t.Cleanup(func() { Version = old })
+
+	var out, errOut bytes.Buffer
+	code := Run([]string{"version"}, strings.NewReader(""), &out, &errOut)
+	if code != 0 {
+		t.Fatalf("code=%d stderr=%s", code, errOut.String())
+	}
+	if strings.TrimSpace(out.String()) != "appicon test-version" {
+		t.Fatalf("version output = %q", out.String())
+	}
+}

@@ -125,4 +125,13 @@ appicon config show
 appicon templates list
 appicon templates show <id>
 appicon generate --app <name> [--idea <text>] [--platform <name>] [--richness minimal|simple|balanced|rich|maximal] [--template <id>] [--provider <name>] [--count <n>] [--size <px>] [--out <dir>] [--dry-run] [--json]
+appicon version
+```
+
+## Homebrew
+
+After a tagged release is published, install from the tap:
+
+```sh
+brew install hwangdev97/tap/appicon
 ```

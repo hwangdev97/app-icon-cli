@@ -18,6 +18,8 @@ import (
 	appicon "github.com/hwang/app-icon-cli/internal/template"
 )
 
+var Version = "dev"
+
 func Run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 	if len(args) == 0 {
 		return wizard(stdin, stdout, stderr)
@@ -33,6 +35,9 @@ func Run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		return generateCmd(args[1:], stdout, stderr, provider.NewHTTP())
 	case "help", "-h", "--help":
 		usage(stdout)
+		return 0
+	case "version", "-v", "--version":
+		fmt.Fprintf(stdout, "appicon %s\n", Version)
 		return 0
 	default:
 		fmt.Fprintf(stderr, "unknown command %q\n\n", args[0])
@@ -50,6 +55,7 @@ Usage:
   appicon templates show <id>
   appicon generate --app "My App" --idea "habit tracker" --template ios-clay-symbol --count 3
   appicon config show
+  appicon version
 
 Environment:
   APPICON_CLI_HOME  Override config directory. Defaults to ~/.appicon-cli`)
