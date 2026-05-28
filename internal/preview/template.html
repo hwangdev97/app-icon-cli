@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.AppName}} App Icon Preview</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f4f5;
+      --panel: #ffffff;
+      --text: #18181b;
+      --muted: #71717a;
+      --line: #e4e4e7;
+      --shadow: 0 18px 50px rgba(24, 24, 27, .12);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #09090b;
+        --panel: #18181b;
+        --text: #f4f4f5;
+        --muted: #a1a1aa;
+        --line: #27272a;
+        --shadow: 0 18px 50px rgba(0, 0, 0, .38);
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    }
+    main {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 40px 0 56px;
+    }
+    header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.15;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+    .meta {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+    .stage {
+      display: grid;
+      place-items: center;
+      min-height: 300px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(45deg, rgba(127, 127, 127, .08) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(127, 127, 127, .08) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(127, 127, 127, .08) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(127, 127, 127, .08) 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .icon-source {
+      display: block;
+      width: min(220px, 70vw);
+      height: auto;
+      image-rendering: auto;
+    }
+    .dock {
+      display: flex;
+      align-items: end;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 18px;
+      min-height: 86px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--panel) 78%, transparent);
+    }
+    .dock .icon-source {
+      width: 64px;
+    }
+    .small-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .small-row .icon-source:nth-child(1) { width: 16px; }
+    .small-row .icon-source:nth-child(2) { width: 32px; }
+    .small-row .icon-source:nth-child(3) { width: 64px; }
+    .caption {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      word-break: break-all;
+    }
+    @media (max-width: 640px) {
+      header { display: block; }
+      main { padding-top: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>{{.AppName}} App Icon Preview</h1>
+        <p class="meta">{{.Platform}} · {{.TemplateID}} · {{.GeneratedAt}}</p>
+      </div>
+      <p class="meta">Source images are shown unmodified. No CSS corner mask is applied to the icon image.</p>
+    </header>
+    <section class="grid">
+      {{range .Icons}}
+      <article class="card">
+        <div class="stage">
+          <img class="icon-source" src="{{.File}}" alt="{{.Name}}">
+        </div>
+        <div class="dock">
+          <img class="icon-source" src="{{.File}}" alt="">
+          <img class="icon-source" src="{{.File}}" alt="">
+          <img class="icon-source" src="{{.File}}" alt="">
+        </div>
+        <div class="small-row">
+          <img class="icon-source" src="{{.File}}" alt="">
+          <img class="icon-source" src="{{.File}}" alt="">
+          <img class="icon-source" src="{{.File}}" alt="">
+        </div>
+        <p class="caption">{{.Name}}</p>
+      </article>
+      {{end}}
+    </section>
+  </main>
+</body>
+</html>
+

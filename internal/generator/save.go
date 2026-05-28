@@ -14,8 +14,9 @@ import (
 )
 
 type Result struct {
-	Files  []string `json:"files"`
-	Prompt string   `json:"prompt"`
+	Files   []string `json:"files"`
+	Prompt  string   `json:"prompt"`
+	Preview string   `json:"preview,omitempty"`
 }
 
 func SaveImages(outDir, appName, templateID string, images []provider.Image) ([]string, error) {

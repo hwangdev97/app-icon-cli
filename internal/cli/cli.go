@@ -14,6 +14,7 @@ import (
 
 	"github.com/hwang/app-icon-cli/internal/config"
 	"github.com/hwang/app-icon-cli/internal/generator"
+	"github.com/hwang/app-icon-cli/internal/preview"
 	"github.com/hwang/app-icon-cli/internal/provider"
 	appicon "github.com/hwang/app-icon-cli/internal/template"
 )
@@ -33,6 +34,8 @@ func Run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		return templatesCmd(args[1:], stdout, stderr)
 	case "generate", "gen":
 		return generateCmd(args[1:], stdout, stderr, provider.NewHTTP())
+	case "preview":
+		return previewCmd(args[1:], stdout, stderr)
 	case "help", "-h", "--help":
 		usage(stdout)
 		return 0
@@ -54,6 +57,7 @@ Usage:
   appicon templates list
   appicon templates show <id>
   appicon generate --app "My App" --idea "habit tracker" --template ios-clay-symbol --count 3
+  appicon preview --app "My App" icon.png
   appicon config show
   appicon version
 
@@ -216,6 +220,8 @@ func generateCmd(args []string, stdout, stderr io.Writer, client provider.Client
 	count := fs.Int("count", 1, "number of icons")
 	size := fs.Int("size", 1024, "icon size")
 	outDir := fs.String("out", "", "output directory")
+	previewEnabled := fs.Bool("preview", false, "write a preview.html next to generated icons")
+	previewPath := fs.String("preview-path", "", "preview HTML path; defaults to <out>/preview.html")
 	dryRun := fs.Bool("dry-run", false, "print request without calling provider")
 	jsonOut := fs.Bool("json", false, "print JSON result")
 	if err := fs.Parse(args); err != nil {
@@ -290,6 +296,27 @@ func generateCmd(args []string, stdout, stderr io.Writer, client provider.Client
 		return 1
 	}
 	result := generator.Result{Files: files, Prompt: prompt}
+	if *previewEnabled {
+		path := *previewPath
+		if path == "" {
+			path = preview.DefaultPath(outputDir(*outDir))
+		}
+		if err := preview.Validate(preview.Data{Icons: preview.IconsFromFiles(files)}); err != nil {
+			fmt.Fprintln(stderr, err)
+			return 1
+		}
+		written, err := preview.Write(path, preview.Data{
+			AppName:    *appName,
+			Platform:   *platform,
+			TemplateID: tpl.ID,
+			Icons:      preview.IconsFromFiles(files),
+		})
+		if err != nil {
+			fmt.Fprintln(stderr, err)
+			return 1
+		}
+		result.Preview = written
+	}
 	manifest := filepath.Join(outputDir(*outDir), "last-run.json")
 	_ = generator.SaveManifest(manifest, result)
 	if *jsonOut {
@@ -299,7 +326,44 @@ func generateCmd(args []string, stdout, stderr io.Writer, client provider.Client
 	for _, file := range files {
 		fmt.Fprintf(stdout, "Created %s\n", file)
 	}
+	if result.Preview != "" {
+		fmt.Fprintf(stdout, "Created preview %s\n", result.Preview)
+	}
 	fmt.Fprintf(stdout, "Saved run manifest %s\n", manifest)
+	return 0
+}
+
+func previewCmd(args []string, stdout, stderr io.Writer) int {
+	fs := flag.NewFlagSet("preview", flag.ContinueOnError)
+	fs.SetOutput(stderr)
+	appName := fs.String("app", "AppIcon", "app name")
+	platform := fs.String("platform", "iPhone", "target platform label")
+	templateID := fs.String("template", "manual", "template label")
+	outPath := fs.String("out", "preview.html", "preview HTML path")
+	if err := fs.Parse(args); err != nil {
+		return 2
+	}
+	files := fs.Args()
+	if len(files) == 0 {
+		fmt.Fprintln(stderr, "usage: appicon preview --app <name> --out preview.html <icon.png> [more.png]")
+		return 2
+	}
+	data := preview.Data{
+		AppName:    *appName,
+		Platform:   *platform,
+		TemplateID: *templateID,
+		Icons:      preview.IconsFromFiles(files),
+	}
+	if err := preview.Validate(data); err != nil {
+		fmt.Fprintln(stderr, err)
+		return 1
+	}
+	path, err := preview.Write(*outPath, data)
+	if err != nil {
+		fmt.Fprintln(stderr, err)
+		return 1
+	}
+	fmt.Fprintf(stdout, "Created preview %s\n", path)
 	return 0
 }
 

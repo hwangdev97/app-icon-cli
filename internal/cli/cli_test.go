@@ -91,6 +91,29 @@ func TestGenerateSavesImageWithInjectedProvider(t *testing.T) {
 	}
 }
 
+func TestGenerateWritesPreview(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("APPICON_CLI_HOME", dir)
+	cfg := config.Default()
+	cfg.Providers["nanobanana"] = config.ProviderConfig{APIKey: "k", BaseURL: "http://example.test", Model: "m"}
+	if _, err := config.Save(cfg); err != nil {
+		t.Fatal(err)
+	}
+	outDir := filepath.Join(dir, "out")
+	var out, errOut bytes.Buffer
+	code := generateCmd([]string{"--app", "Focus", "--out", outDir, "--preview", "--json"}, &out, &errOut, fakeProvider{})
+	if code != 0 {
+		t.Fatalf("code=%d stderr=%s", code, errOut.String())
+	}
+	previewPath := filepath.Join(outDir, "preview.html")
+	if _, err := os.Stat(previewPath); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out.String(), `"preview"`) {
+		t.Fatalf("json output missing preview: %s", out.String())
+	}
+}
+
 func TestConfigShowMasksAPIKey(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv("APPICON_CLI_HOME", dir)
@@ -157,5 +180,22 @@ func TestVersionCommand(t *testing.T) {
 	}
 	if strings.TrimSpace(out.String()) != "appicon test-version" {
 		t.Fatalf("version output = %q", out.String())
+	}
+}
+
+func TestPreviewCommand(t *testing.T) {
+	dir := t.TempDir()
+	icon := filepath.Join(dir, "icon.png")
+	if err := os.WriteFile(icon, []byte("png"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	outPath := filepath.Join(dir, "preview.html")
+	var out, errOut bytes.Buffer
+	code := Run([]string{"preview", "--app", "Focus", "--platform", "macOS", "--out", outPath, icon}, strings.NewReader(""), &out, &errOut)
+	if code != 0 {
+		t.Fatalf("code=%d stderr=%s", code, errOut.String())
+	}
+	if _, err := os.Stat(outPath); err != nil {
+		t.Fatal(err)
 	}
 }

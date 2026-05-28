@@ -125,8 +125,25 @@ appicon config show
 appicon templates list
 appicon templates show <id>
 appicon generate --app <name> [--idea <text>] [--platform <name>] [--richness minimal|simple|balanced|rich|maximal] [--template <id>] [--provider <name>] [--count <n>] [--size <px>] [--out <dir>] [--dry-run] [--json]
+appicon preview --app <name> --out preview.html <icon.png> [more.png]
 appicon version
 ```
+
+## Preview
+
+Generate a browser preview alongside new icons:
+
+```sh
+appicon generate --app "Focus Timer" --idea "deep work timer" --preview
+```
+
+Or preview existing PNG files:
+
+```sh
+appicon preview --app "Focus Timer" --platform macOS --out ./appicons/preview.html ./appicons/icon.png
+```
+
+The preview uses the original 1024 x 1024 image directly. It does not add a CSS corner radius or mask to the icon image; rounded platform treatment should be applied later in Icon Composer or the target platform pipeline.
 
 ## Homebrew
 
